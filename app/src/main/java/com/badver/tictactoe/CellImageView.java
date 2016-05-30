@@ -1,6 +1,7 @@
 package com.badver.tictactoe;
 
 import android.content.Context;
+import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 
@@ -31,12 +32,19 @@ public class CellImageView extends AppCompatImageView {
             case EMPTY:
                 break;
             case YELLOW:
-                this.setImageResource(R.drawable.yellow);
+                showImage(R.drawable.yellow);
                 break;
             case RED:
-                this.setImageResource(R.drawable.red);
+                showImage(R.drawable.red);
                 break;
         }
+    }
+
+    private void showImage(int red) {
+        setAlpha(0.0f);
+        setRotation(0);
+        setImageResource(red);
+        animate().alpha(1.0f).setInterpolator(new FastOutSlowInInterpolator()).rotation(360f).setDuration(300);
     }
 
     @Override

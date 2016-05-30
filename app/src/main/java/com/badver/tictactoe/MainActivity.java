@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
                 c.setLayoutParams(params);
                 grid.addView(c);
 
-
                 cells[i][j] = c;
 
                 c.setOnClickListener(new View.OnClickListener() {
@@ -62,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
-
         }
     }
 }
