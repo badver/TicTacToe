@@ -7,6 +7,8 @@ import android.util.AttributeSet;
 
 public class CellImageView extends AppCompatImageView {
 
+    private static final int ANIMATION_DURATION = 300;
+    private static final float ROTATION_ANGLE = 360f;
     private MarkType markType = MarkType.EMPTY;
 
     public CellImageView(Context context) {
@@ -44,7 +46,7 @@ public class CellImageView extends AppCompatImageView {
         setAlpha(0.0f);
         setRotation(0);
         setImageResource(red);
-        animate().alpha(1.0f).setInterpolator(new FastOutSlowInInterpolator()).rotation(360f).setDuration(300);
+        animate().alpha(1.0f).setInterpolator(new FastOutSlowInInterpolator()).rotation(ROTATION_ANGLE).setDuration(ANIMATION_DURATION);
     }
 
     @Override
