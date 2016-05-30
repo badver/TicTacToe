@@ -1,5 +1,5 @@
 package com.badver.tictactoe;
 
-public enum CellType {
+public enum MarkType {
     EMPTY, RED, YELLOW
 }

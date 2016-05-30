@@ -7,7 +7,7 @@ import android.util.AttributeSet;
 
 public class CellImageView extends AppCompatImageView {
 
-    private CellType cellType = CellType.EMPTY;
+    private MarkType markType = MarkType.EMPTY;
 
     public CellImageView(Context context) {
         super(context);
@@ -21,14 +21,14 @@ public class CellImageView extends AppCompatImageView {
         super(context, attrs, defStyleAttr);
     }
 
-    public CellType getCellType() {
-        return cellType;
+    public MarkType getMarkType() {
+        return markType;
     }
 
-    public void setCellType(CellType cellType) {
-        this.cellType = cellType;
+    public void setMarkType(MarkType markType) {
+        this.markType = markType;
 
-        switch (cellType) {
+        switch (markType) {
             case EMPTY:
                 break;
             case YELLOW:
@@ -50,7 +50,7 @@ public class CellImageView extends AppCompatImageView {
     @Override
     public String toString() {
         return "CellImageView{" +
-                "cellType=" + cellType +
+                       "markType=" + markType +
                 '}';
     }
 }
