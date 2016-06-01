@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private MarkType activePlayer = MarkType.YELLOW;
     private Button resetButton;
     private TextView lastWinnerText;
+    private boolean gameOver = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
                 resetCells();
                 resetButton.setVisibility(View.INVISIBLE);
                 lastWinnerText.setVisibility(View.INVISIBLE);
+                gameOver = false;
             }
         });
 
@@ -135,7 +137,8 @@ public class MainActivity extends AppCompatActivity {
         this.activePlayer = activePlayer;
     }
 
-    private void restart() {
+    private void showGameOver() {
+        gameOver = true;
         resetButton.setVisibility(View.VISIBLE);
         lastWinnerText.setVisibility(View.VISIBLE);
 
@@ -144,10 +147,10 @@ public class MainActivity extends AppCompatActivity {
             case EMPTY:
                 break;
             case RED:
-                lastWinner = "Red Player";
+                lastWinner = "Winner: Red Player";
                 break;
             case YELLOW:
-                lastWinner = "Yellow Player";
+                lastWinner = "Winner: Yellow Player";
                 break;
         }
         lastWinnerText.setText(lastWinner);
@@ -172,6 +175,8 @@ public class MainActivity extends AppCompatActivity {
     private class CellOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
+            if (gameOver) return;
+
             CellImageView cell = (CellImageView) v;
             if (cell.getMarkType() != MarkType.EMPTY) {
                 Toast.makeText(MainActivity.this, "Try another cell", Toast.LENGTH_SHORT).show();
@@ -191,12 +196,12 @@ public class MainActivity extends AppCompatActivity {
                     nextPlayer();
                 }
                 else {
-                    restart();
+                    showGameOver();
                 }
             }
             else {
                 Toast.makeText(MainActivity.this, "Winner: " + winner, Toast.LENGTH_SHORT).show();
-                restart();
+                showGameOver();
             }
         }
     }
