@@ -5,26 +5,72 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final int[][] WIN_LINES = new int[][]{
+        /*
+        * 0 1 2
+        * 3 4 5
+        * 6 7 8
+        */
+
+        // horizontal
+        {0, 1, 2},
+        {3, 4, 5},
+        {6, 7, 8},
+
+        // vertical
+        {0, 3, 6},
+        {1, 4, 7},
+        {2, 5, 8},
+
+        // diagonal
+        {0, 4, 8},
+        {2, 4, 6}
+    };
     private static final int COL = 3;
     private static final int ROW = 3;
-    private static final int IMAGE_HEIGHT = 96;
-    private static final int IMAGE_WIDTH = 96;
+    private static final int IMAGE_HEIGHT = 90;
+    private static final int IMAGE_WIDTH = 90;
     private static final float HORIZONTAL_MARGIN = 11f;
     private static final float VERTICAL_MARGIN = 11f;
     private final CellImageView[][] cells = new CellImageView[ROW][COL];
     private MarkType activePlayer = MarkType.YELLOW;
+    private Button resetButton;
+    private TextView lastWinnerText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        resetButton = (Button) findViewById(R.id.reset_button);
+        lastWinnerText = (TextView) findViewById(R.id.last_winner_text);
+
+        resetButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resetCells();
+                resetButton.setVisibility(View.INVISIBLE);
+                lastWinnerText.setVisibility(View.INVISIBLE);
+            }
+        });
+
         createCells();
+    }
+
+    private void resetCells() {
+        for (CellImageView[] row : cells) {
+            for (CellImageView cell : row) {
+                cell.setMarkType(MarkType.EMPTY);
+            }
+        }
     }
 
     private void createCells() {
@@ -36,7 +82,9 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 0; i < cells.length; ++i) {
             for (int j = 0; j < cells[i].length; ++j) {
-                CellImageView newCell = new CellImageView(this);
+
+                LinearLayout lay = (LinearLayout) getLayoutInflater().inflate(R.layout.image_cell, null);
+                CellImageView newCell = (CellImageView) lay.getChildAt(0);
 
                 int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, IMAGE_HEIGHT, getResources().getDisplayMetrics());
                 int width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, IMAGE_WIDTH, getResources().getDisplayMetrics());
@@ -50,48 +98,24 @@ public class MainActivity extends AppCompatActivity {
                 params.setGravity(Gravity.CENTER);
                 newCell.setMarkType(MarkType.EMPTY);
                 newCell.setVisibility(View.VISIBLE);
-                newCell.setLayoutParams(params);
+                lay.setLayoutParams(params);
                 newCell.setOnClickListener(new CellOnClickListener());
 
-                grid.addView(newCell);
+                grid.addView(lay);
                 cells[i][j] = newCell;
             }
         }
     }
 
-    private MarkType getWinner() {
-        MarkType winner = MarkType.EMPTY;
-
-        /*
-        * 0 1 2
-        * 3 4 5
-        * 6 7 8
-        */
-        final int[][] winLines = {
-            {0, 1, 2},
-            {3, 4, 5},
-            {6, 7, 8},
-
-            {0, 3, 6},
-            {1, 4, 7},
-            {2, 5, 8},
-
-            {0, 4, 8},
-            {2, 4, 6}
-        };
-
-
-        for (int[] line : winLines) {
-            if (cells[line[0] / ROW][line[0] % COL].getMarkType() != MarkType.EMPTY &&
-                cells[line[0] / ROW][line[0] % COL].getMarkType() == cells[line[1] / ROW][line[1] % COL].getMarkType() &&
-                cells[line[1] / ROW][line[1] % COL].getMarkType() == cells[line[2] / ROW][line[2] % COL].getMarkType()) {
-
-                winner = cells[line[0] / ROW][line[0] % COL].getMarkType();
-                break;
+    private boolean hasEmptyCell() {
+        for (CellImageView[] row : cells) {
+            for (CellImageView cell : row) {
+                if (cell.getMarkType() == MarkType.EMPTY) {
+                    return true;
+                }
             }
         }
-
-        return winner;
+        return false;
     }
 
     private void nextPlayer() {
@@ -111,11 +135,46 @@ public class MainActivity extends AppCompatActivity {
         this.activePlayer = activePlayer;
     }
 
+    private void restart() {
+        resetButton.setVisibility(View.VISIBLE);
+        lastWinnerText.setVisibility(View.VISIBLE);
+
+        String lastWinner = "No winner";
+        switch (getWinner()) {
+            case EMPTY:
+                break;
+            case RED:
+                lastWinner = "Red Player";
+                break;
+            case YELLOW:
+                lastWinner = "Yellow Player";
+                break;
+        }
+        lastWinnerText.setText(lastWinner);
+    }
+
+    private MarkType getWinner() {
+        MarkType winner = MarkType.EMPTY;
+
+        for (int[] line : WIN_LINES) {
+            if (cells[line[0] / ROW][line[0] % COL].getMarkType() != MarkType.EMPTY &&
+                cells[line[0] / ROW][line[0] % COL].getMarkType() == cells[line[1] / ROW][line[1] % COL].getMarkType() &&
+                cells[line[1] / ROW][line[1] % COL].getMarkType() == cells[line[2] / ROW][line[2] % COL].getMarkType()) {
+
+                winner = cells[line[0] / ROW][line[0] % COL].getMarkType();
+                break;
+            }
+        }
+
+        return winner;
+    }
+
     private class CellOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
             CellImageView cell = (CellImageView) v;
             if (cell.getMarkType() != MarkType.EMPTY) {
+                Toast.makeText(MainActivity.this, "Try another cell", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -128,10 +187,16 @@ public class MainActivity extends AppCompatActivity {
 
             MarkType winner = getWinner();
             if (winner == MarkType.EMPTY) {
-                nextPlayer();
+                if (hasEmptyCell()) {
+                    nextPlayer();
+                }
+                else {
+                    restart();
+                }
             }
             else {
                 Toast.makeText(MainActivity.this, "Winner: " + winner, Toast.LENGTH_SHORT).show();
+                restart();
             }
         }
     }

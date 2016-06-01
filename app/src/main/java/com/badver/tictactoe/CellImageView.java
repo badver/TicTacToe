@@ -32,6 +32,7 @@ public class CellImageView extends AppCompatImageView {
 
         switch (markType) {
             case EMPTY:
+                setImageResource(0);
                 break;
             case YELLOW:
                 showImage(R.drawable.yellow);
